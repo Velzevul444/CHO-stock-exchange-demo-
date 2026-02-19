@@ -1,0 +1,64 @@
+body {
+	margin: 0;
+	background: #0f172a;
+	color: white;
+	font-family: Arial, sans-serif;
+	text-align: center;
+}
+
+h1 {
+	padding: 20px;
+}
+
+#chart {
+	width: 95%;
+	height: 600px;
+	margin: auto;
+}
+#registration{
+	text-align: right;
+	margin: 20px 0px 0px 1050px;
+	background-color: #cdcfd5;
+	width: 100px;
+}
+#login{
+	margin: -20px 0px 0px 750px;
+}
+#bet-panel{
+	margin-top:20px;
+}
+
+.bet{
+	padding:15px 40px;
+	font-size:20px;
+	border:none;
+	margin:10px;
+	cursor:pointer;
+	border-radius:10px;
+	font-weight:bold;
+}
+
+.up{
+	background:#16a34a;
+	color:white;
+}
+
+.down{
+	background:#dc2626;
+	color:white;
+}
+
+#result{
+	margin-top:15px;
+	font-size:24px;
+	font-weight:bold;
+}
+#scoreboard{
+	margin-top:15px;
+	font-size:22px;
+	font-weight:bold;
+	background:#020617;
+	display:inline-block;
+	padding:12px 20px;
+	border-radius:12px;
+}

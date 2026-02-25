@@ -11,8 +11,15 @@ function updateCoins() {
 	coinsLabel.textContent = coins;
 }
 
-document.getElementById("up").onclick = () => placeBet("up");
-document.getElementById("down").onclick = () => placeBet("down");
+document.getElementById("up").onclick = () => {
+	janitorSwingUp();
+	placeBet("up");
+};
+
+document.getElementById("down").onclick = () => {
+	janitorSwingDown();
+	placeBet("down");
+};
 
 function placeBet(direction) {
 	if (!lastCandle) return;
@@ -52,3 +59,6 @@ window.onPriceUpdated = (candle, closed) => {
 document.getElementById("symbol-select").onchange = e => {
 	changeSymbol(e.target.value);
 };
+Janitor.instance.add(() => {
+	console.log("Очистка ресурсов при выходе");
+});

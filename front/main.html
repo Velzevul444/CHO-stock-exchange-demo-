@@ -3,12 +3,16 @@
 <head>
 	<meta charset="UTF-8">
 	<title>freedom</title>
+
+	<link href="/front/css.css" rel="stylesheet" type="text/css">
 </head>
+
 <body>
-<link href="/front/css.css" rel="stylesheet" type="text/css" >
+
 <div id="registration">Регистрация</div>
 <div id="login">Вход</div>
-<h1 class = "headear">OOO"Честные ставки"</h1>
+
+<h1 class="headear">OOO "Честные ставки"</h1>
 
 <div id="chart">
 	<div id="symbol-wrapper">
@@ -22,6 +26,7 @@
 		</select>
 	</div>
 </div>
+
 <div id="bet-panel">
 
 	<div id="price">Цена: -</div>
@@ -31,14 +36,23 @@
 
 	<div id="result">Ставка не сделана</div>
 </div>
+
 <div id="scoreboard">
 	Коины: <span id="coins">0</span>
 </div>
 
+<!-- lightweight charts -->
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
 
+<!-- твои файлы -->
 <script type="module" src="/front/js/chart.js"></script>
 <script type="module" src="/front/js/main.js"></script>
+<script type="module" src="/front/js/janitor.js"></script>
+
+<!-- Canvas для анимации Janitor -->
+<div id="janitor-container">
+	<canvas id="janitorCanvas" width="200" height="200"></canvas>
+</div>
 
 </body>
 </html>

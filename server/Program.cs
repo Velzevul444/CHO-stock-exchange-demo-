@@ -10,7 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- CORS: разрешить все для локальной разработки ---
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -20,11 +19,9 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod());
 });
 
-// --- Swagger ---
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// --- JWT ---
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtSecret = jwtSection.GetValue<string>("Secret") ?? throw new InvalidOperationException("Jwt:Secret missing");
 var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret));
@@ -53,23 +50,19 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// --- Middleware ---
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Включаем глобальный CORS для всех origin
 app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-// --- DB Connection ---
 string connStr = app.Configuration.GetConnectionString("Default")!;
 
-// --- Helpers ---
 string GenerateJwtToken(string email)
 {
     var claims = new[]
@@ -103,7 +96,6 @@ int GetUserIdByEmail(IDbConnection db, string email)
     return Convert.ToInt32(result);
 }
 
-// --- Auth Endpoints ---
 app.MapPost("/api/auth/register", (RegisterRequest req) =>
 {
     if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Password))
@@ -156,7 +148,6 @@ app.MapPost("/api/auth/login", (LoginRequest req) =>
     return Results.Ok(new AuthResponse(token, req.Email));
 });
 
-// --- Menu endpoints ---
 app.MapGet("/api/menu", () =>
 {
     using var db = new SqlConnection(connStr);
@@ -206,7 +197,6 @@ app.MapGet("/api/menu/availability", (DateOnly date) =>
     return Results.Ok(result);
 });
 
-// --- Preorder (auth) ---
 app.MapPost("/api/preorders", [Authorize] (PreorderRequest req, ClaimsPrincipal user) =>
 {
     var email = user.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? user.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -248,7 +238,6 @@ app.MapPost("/api/preorders", [Authorize] (PreorderRequest req, ClaimsPrincipal 
     return Results.Ok(new { Message = "Предзаказ создан" });
 });
 
-// --- Reservations ---
 app.MapPost("/api/reservations", [Authorize] (ReservationRequest req, ClaimsPrincipal user) =>
 {
     var email = user.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? user.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -313,7 +302,6 @@ app.MapGet("/api/reservations", (int tableId, DateTime dateUtc) =>
 
 app.Run();
 
-// --- DTOs ---
 record RegisterRequest(string Email, string Password);
 record LoginRequest(string Email, string Password);
 record AuthResponse(string Token, string Email);

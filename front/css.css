@@ -11,54 +11,120 @@ h1 {
 }
 
 #chart {
+	position: relative;
 	width: 95%;
 	height: 600px;
 	margin: auto;
 }
-#registration{
-	text-align: right;
-	margin: 20px 0px 0px 1050px;
-	background-color: #cdcfd5;
-	width: 100px;
-}
-#login{
-	margin: -20px 0px 0px 750px;
-}
-#bet-panel{
-	margin-top:20px;
+
+#registration, #login {
+	position: absolute;
+	top: 15px;
+	padding: 10px 18px;
+	font-size: 16px;
+	font-weight: bold;
+	background: #1e293b;
+	color: #e2e8f0;
+	border: 1px solid #334155;
+	border-radius: 10px;
+	cursor: pointer;
+	transition: 0.15s;
+	box-shadow: 0 0 10px rgba(0,0,0,0.35);
 }
 
-.bet{
-	padding:15px 40px;
-	font-size:20px;
-	border:none;
-	margin:10px;
-	cursor:pointer;
-	border-radius:10px;
-	font-weight:bold;
+#registration {
+	right: 20px;
 }
 
-.up{
-	background:#16a34a;
-	color:white;
+#login {
+	right: 150px;
 }
 
-.down{
-	background:#dc2626;
-	color:white;
+#registration:hover,
+#login:hover {
+	background: #334155;
+	border-color: #475569;
+	transform: translateY(-2px);
 }
 
-#result{
-	margin-top:15px;
-	font-size:24px;
-	font-weight:bold;
+#registration:active,
+#login:active {
+	transform: translateY(0);
 }
-#scoreboard{
-	margin-top:15px;
-	font-size:22px;
-	font-weight:bold;
-	background:#020617;
-	display:inline-block;
-	padding:12px 20px;
-	border-radius:12px;
+
+#bet-panel {
+	margin-top: 20px;
+}
+
+.bet {
+	padding: 15px 40px;
+	font-size: 20px;
+	border: none;
+	margin: 10px;
+	cursor: pointer;
+	border-radius: 10px;
+	font-weight: bold;
+}
+
+.up {
+	background: #16a34a;
+	color: white;
+}
+
+.down {
+	background: #dc2626;
+	color: white;
+}
+
+#result {
+	margin-top: 15px;
+	font-size: 24px;
+	font-weight: bold;
+}
+
+#scoreboard {
+	margin-top: 15px;
+	font-size: 22px;
+	font-weight: bold;
+	background: #020617;
+	display: inline-block;
+	padding: 12px 20px;
+	border-radius: 12px;
+}
+
+#symbol-wrapper {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	background: rgba(2, 6, 23, 0.85);
+	border: 1px solid #1e293b;
+	padding: 10px 14px;
+	border-radius: 12px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	box-shadow: 0 0 12px rgba(0,0,0,0.4);
+	backdrop-filter: blur(5px);
+	z-index: 9999;
+}
+
+#symbol-label {
+	font-size: 14px;
+	color: #cbd5e1;
+	font-weight: bold;
+}
+
+#symbol-select {
+	background: #0f172a;
+	color: #e2e8f0;
+	border: 1px solid #334155;
+	padding: 7px 12px;
+	font-size: 14px;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+#symbol-select:hover {
+	border-color: #64748b;
 }

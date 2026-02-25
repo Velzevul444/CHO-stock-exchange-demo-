@@ -3,29 +3,25 @@
 <head>
 	<meta charset="UTF-8">
 	<title>freedom</title>
-	<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 <body>
-<link href="/css.css" rel="stylesheet" type="text/css" >
+<link href="/front/css.css" rel="stylesheet" type="text/css" >
 <div id="registration">Регистрация</div>
 <div id="login">Вход</div>
-<h1 class = "headear">Hello World!</h1>
-<abbr title = "i kill him">tun tun sahur</abbr><br>
-<a href="https://en.wikipedia.org/wiki/God_is_dead" target="_blank">read</a>
-<a href="mailto:zeletustra@evil.com">write</a>
-<form action="https://formspree.io/zeletustra@evil.com" method="POST">
-	<input type="text" placeholder="name" value="im gay" maxlength="1">
-	<input type="color">
-	<input type="submit">
-	<select>
-		<option>choose</option>
-		<option>death</option>
-		<option>death</option>
-		<option>death</option>
-		<option>death</option>
-	</select>
-</form>
-<div id="chart"></div>
+<h1 class = "headear">OOO"Честные ставки"</h1>
+
+<div id="chart">
+	<div id="symbol-wrapper">
+		<span id="symbol-label">Монета:</span>
+		<select id="symbol-select">
+			<option value="BTCUSDT">BTC</option>
+			<option value="ETHUSDT">ETH</option>
+			<option value="BNBUSDT">BNB</option>
+			<option value="SOLUSDT">SOL</option>
+			<option value="XRPUSDT">XRP</option>
+		</select>
+	</div>
+</div>
 <div id="bet-panel">
 
 	<div id="price">Цена: -</div>
@@ -36,14 +32,13 @@
 	<div id="result">Ставка не сделана</div>
 </div>
 <div id="scoreboard">
-	Очки: <span id="score">0</span> |
-	Победы: <span id="wins">0</span> |
-	Поражения: <span id="losses">0</span>
+	Коины: <span id="coins">0</span>
 </div>
 
-<div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo, tempora.</div>
-<progress></progress>
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
 
-<script src="/js/main.js"></script>
+<script type="module" src="/front/js/chart.js"></script>
+<script type="module" src="/front/js/main.js"></script>
+
 </body>
 </html>

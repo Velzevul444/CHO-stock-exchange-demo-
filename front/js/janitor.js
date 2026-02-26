@@ -1,7 +1,3 @@
-// =============================
-//  Pixel Janitor — improved 3-state broom system
-// =============================
-
 class PixelJanitor {
 	constructor() {
 		this.canvas = document.getElementById("janitorCanvas");
@@ -14,18 +10,16 @@ class PixelJanitor {
 		this.draw("idle");
 	}
 
-	// =======================================================
-	// Основной рисунок уборщика + три варианта расположения метлы
-	// =======================================================
+
 	draw(state) {
 		const ctx = this.ctx;
 		ctx.clearRect(0, 0, 200, 200);
 
-		// масштаб (оригинал 400х400)
+
 		ctx.save();
 		ctx.scale(0.5, 0.5);
 
-		// ---------- пол ----------
+
 		ctx.fillStyle = "#78909c";
 		ctx.fillRect(0, 280, 400, 120);
 
@@ -45,7 +39,7 @@ class PixelJanitor {
 			BROOM_DARK: "#a5713c"
 		};
 
-		// ---------- тело ----------
+
 		ctx.fillStyle = C.OVERALL_DARK;
 		ctx.fillRect(160, 230, 25, 50);
 		ctx.fillRect(215, 230, 25, 50);
@@ -56,7 +50,7 @@ class PixelJanitor {
 		ctx.fillStyle = C.OVERALL_DARK;
 		ctx.fillRect(150, 200, 100, 10);
 
-		// ---------- голова ----------
+
 		ctx.fillStyle = C.SKIN;
 		ctx.fillRect(175, 130, 50, 50);
 
@@ -80,7 +74,7 @@ class PixelJanitor {
 		ctx.fillRect(170, 158, 10, 5);
 		ctx.fillRect(250, 158, 10, 5);
 
-		// ---------- руки ----------
+
 		ctx.fillStyle = C.SKIN;
 
 		if (state === "up") {
@@ -95,11 +89,7 @@ class PixelJanitor {
 			ctx.fillRect(255, 180, 25, 15);
 		}
 
-		// =======================================================
-		//                    МЕТЛА
-		// =======================================================
 
-		// ----- UP -----
 		if (state === "up") {
 			ctx.fillStyle = C.BROOM_HANDLE;
 			ctx.fillRect(280, 110, 100, 12);
@@ -113,7 +103,7 @@ class PixelJanitor {
 			ctx.fillRect(360, 110, 30, 10);
 		}
 
-		// ----- DOWN (ниже обычного) -----
+
 		else if (state === "down") {
 			ctx.fillStyle = C.BROOM_HANDLE;
 			ctx.fillRect(270, 225, 110, 12); // ниже пола
@@ -125,7 +115,7 @@ class PixelJanitor {
 			ctx.fillRect(360, 255, 40, 10);
 		}
 
-		// ----- IDLE (оригинальная позиция) -----
+
 		else {
 			ctx.fillStyle = C.BROOM_HANDLE;
 			ctx.fillRect(270, 190, 100, 10);
@@ -140,9 +130,6 @@ class PixelJanitor {
 		ctx.restore();
 	}
 
-	// =======================================================
-	//   Анимации (вверх / вниз → idle)
-	// =======================================================
 	animate(direction) {
 		if (this.isAnimating) return;
 		this.isAnimating = true;
@@ -157,9 +144,6 @@ class PixelJanitor {
 		}, 260);
 	}
 
-	// =======================================================
-	//        Повторные взмахи пока ставка активна
-	// =======================================================
 	startLoop(direction) {
 		this.stopLoop();
 		this.loopTimer = setInterval(() => this.animate(direction), 450);
@@ -173,9 +157,7 @@ class PixelJanitor {
 	}
 }
 
-// глобальный объект
 window.Janitor = new PixelJanitor();
 
-// удобные alias-функции
 window.janitorSwingUp   = () => window.Janitor.animate("up");
 window.janitorSwingDown = () => window.Janitor.animate("down");

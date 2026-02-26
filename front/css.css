@@ -10,14 +10,11 @@ h1 {
 	padding: 20px;
 }
 
-#chart {
-	position: relative;
-	width: 95%;
-	height: 600px;
-	margin: auto;
-}
+/* ================== AUTH BUTTONS ================== */
 
-#registration, #login {
+#registration,
+#login,
+#adminPanelBtn {
 	position: absolute;
 	top: 15px;
 	padding: 10px 18px;
@@ -32,25 +29,34 @@ h1 {
 	box-shadow: 0 0 10px rgba(0,0,0,0.35);
 }
 
-#registration {
-	right: 20px;
-}
-
-#login {
-	right: 150px;
-}
+#registration { right: 20px; }
+#login { right: 150px; }
+#adminPanelBtn { right: 280px; background:#7c3aed; }
 
 #registration:hover,
-#login:hover {
+#login:hover,
+#adminPanelBtn:hover {
 	background: #334155;
 	border-color: #475569;
 	transform: translateY(-2px);
 }
 
 #registration:active,
-#login:active {
+#login:active,
+#adminPanelBtn:active {
 	transform: translateY(0);
 }
+
+/* ================== CHART ================== */
+
+#chart {
+	position: relative;
+	width: 95%;
+	height: 600px;
+	margin: auto;
+}
+
+/* ================== BET PANEL ================== */
 
 #bet-panel {
 	margin-top: 20px;
@@ -64,17 +70,15 @@ h1 {
 	cursor: pointer;
 	border-radius: 10px;
 	font-weight: bold;
+	transition: 0.2s;
 }
 
-.up {
-	background: #16a34a;
-	color: white;
+.bet:hover {
+	transform: scale(1.05);
 }
 
-.down {
-	background: #dc2626;
-	color: white;
-}
+.up { background: #16a34a; }
+.down { background: #dc2626; }
 
 #result {
 	margin-top: 15px;
@@ -91,6 +95,8 @@ h1 {
 	padding: 12px 20px;
 	border-radius: 12px;
 }
+
+/* ================== SYMBOL SELECT ================== */
 
 #symbol-wrapper {
 	position: absolute;
@@ -129,25 +135,7 @@ h1 {
 	border-color: #64748b;
 }
 
-#janitor-container {
-	position: fixed;
-	bottom: 20px;
-	right: 20px;
-	background: rgba(15, 23, 42, 0.9);
-	border: 2px solid #1e293b;
-	padding: 12px;
-	border-radius: 14px;
-	box-shadow: 0 0 20px rgba(0,0,0,0.45);
-	backdrop-filter: blur(4px);
-	z-index: 99999;
-}
-
-#janitorCanvas {
-	width: 200px;
-	height: 200px;
-	image-rendering: crisp-edges;
-	cursor: pointer;
-}
+/* ================== JANITOR ================== */
 
 #janitor-container {
 	position: fixed;
@@ -155,13 +143,16 @@ h1 {
 	bottom: 20px;
 	width: 200px;
 	height: 200px;
-	opacity: 0.85;
+	opacity: 0.9;
 }
 
 #janitorCanvas {
 	width: 100%;
 	height: 100%;
+	cursor: pointer;
 }
+
+/* ================== MODALS ================== */
 
 .modal {
 	position: fixed;
@@ -184,8 +175,13 @@ h1 {
 	display: flex;
 	flex-direction: column;
 	gap: 15px;
-	width: 300px;
+	width: 320px;
 	border: 1px solid #334155;
+	box-shadow: 0 0 25px rgba(0,0,0,0.6);
+}
+
+.modal-content h2 {
+	margin: 0;
 }
 
 .modal-content input {
@@ -202,19 +198,109 @@ h1 {
 	border: none;
 	cursor: pointer;
 	font-weight: bold;
+	transition: 0.2s;
+}
+
+.modal-content button:hover {
+	transform: scale(1.05);
 }
 
 #authSubmit {
 	background: #16a34a;
-	color: white;
 }
 
 #authClose {
 	background: #dc2626;
-	color: white;
 }
 
 #authError {
 	color: #ef4444;
 	font-weight: bold;
 }
+
+/* ================== ADMIN PANEL ================== */
+
+#adminUsersList {
+	text-align: left;
+	max-height: 300px;
+	overflow-y: auto;
+	background: #1e293b;
+	padding: 15px;
+	border-radius: 10px;
+}
+
+#adminUsersList div {
+	background: #0f172a;
+	padding: 10px;
+	border-radius: 8px;
+	margin-bottom: 8px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 10px;
+}
+
+#adminUsersList input {
+	width: 70px;
+	text-align: center;
+	background: #020617;
+	border: 1px solid #334155;
+	color: white;
+	border-radius: 6px;
+	padding: 5px;
+}
+
+#adminUsersList button {
+	background: #7c3aed;
+	color: white;
+	padding: 6px 10px;
+	border-radius: 6px;
+}
+
+/* ================== CHAT ================== */
+
+#chatMessages {
+	height: 220px;
+	overflow-y: auto;
+	background: #1e293b;
+	padding: 10px;
+	border-radius: 10px;
+	text-align: left;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.chat-message {
+	padding: 8px 12px;
+	border-radius: 8px;
+	max-width: 80%;
+	font-size: 14px;
+}
+
+.chat-user {
+	background: #2563eb;
+	align-self: flex-start;
+}
+
+.chat-admin {
+	background: #16a34a;
+	align-self: flex-end;
+}
+
+#chatInput {
+	background: #020617;
+	border: 1px solid #334155;
+	color: white;
+	border-radius: 8px;
+	padding: 8px;
+}
+
+#chatSend {
+	background: #7c3aed;
+}
+
+#chatClose {
+	background: #dc2626;
+}
+

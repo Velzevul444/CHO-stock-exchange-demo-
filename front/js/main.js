@@ -1,15 +1,12 @@
-// ===============================
-// CONFIG
-// ===============================
 const API = "http://localhost:5219/api";
 
 let activeBet = null;
 let coins = 0;
 let currentUser = JSON.parse(localStorage.getItem("user"));
 
-// ===============================
-// DOM
-// ===============================
+let guestBetCount = 0;          // счётчик для гостя
+const MAX_GUEST_BETS = 5;       // лимит для гостя
+
 const priceLabel = document.getElementById("price");
 const resultLabel = document.getElementById("result");
 const coinsLabel = document.getElementById("coins");
@@ -19,12 +16,16 @@ const title = document.getElementById("authTitle");
 const usernameInput = document.getElementById("authUsername");
 const passwordInput = document.getElementById("authPassword");
 const errorDiv = document.getElementById("authError");
+const isAdminCheckbox = document.getElementById("authIsAdmin");
+
+const adminBtn = document.getElementById("adminPanelBtn");
+const adminModal = document.getElementById("adminModal");
+const adminUsersList = document.getElementById("adminUsersList");
 
 let mode = "login";
 
-// ===============================
-// INIT
-// ===============================
+/* ================= INIT ================= */
+
 function updateCoins() {
 	coinsLabel.textContent = coins;
 }
@@ -32,15 +33,22 @@ function updateCoins() {
 if (currentUser) {
 	coins = currentUser.coins;
 	updateCoins();
+
+	if (currentUser.isAdmin) {
+		adminBtn.classList.remove("hidden");
+	}
+} else {
+	coins = 0;
+	updateCoins();
 }
 
-// ===============================
-// AUTH UI
-// ===============================
+/* ================= AUTH ================= */
+
 document.getElementById("login").onclick = () => {
 	mode = "login";
 	title.textContent = "Вход";
 	errorDiv.textContent = "";
+	isAdminCheckbox.style.display = "none";
 	modal.classList.remove("hidden");
 };
 
@@ -48,6 +56,7 @@ document.getElementById("registration").onclick = () => {
 	mode = "register";
 	title.textContent = "Регистрация";
 	errorDiv.textContent = "";
+	isAdminCheckbox.style.display = "inline";
 	modal.classList.remove("hidden");
 };
 
@@ -55,9 +64,6 @@ document.getElementById("authClose").onclick = () => {
 	modal.classList.add("hidden");
 };
 
-// ===============================
-// REGISTER / LOGIN
-// ===============================
 document.getElementById("authSubmit").onclick = async () => {
 
 	const username = usernameInput.value.trim();
@@ -70,15 +76,22 @@ document.getElementById("authSubmit").onclick = async () => {
 
 	try {
 
-		// ================= REGISTER =================
 		if (mode === "register") {
+
+			if (isAdminCheckbox.checked) {
+				let code = prompt("Введите секретный код администратора:");
+				if (code !== "SUPERADMIN123") {
+					errorDiv.textContent = "Неверный код администратора";
+					return;
+				}
+			}
 
 			const newUser = {
 				id: 0,
-				username: username,
+				username,
 				passwordHash: password,
 				coins: 10,
-				isAdmin: false
+				isAdmin: isAdminCheckbox.checked
 			};
 
 			const res = await fetch(`${API}/users`, {
@@ -88,16 +101,15 @@ document.getElementById("authSubmit").onclick = async () => {
 			});
 
 			if (!res.ok) {
-				errorDiv.textContent = "Пользователь уже существует или ошибка данных";
+				errorDiv.textContent = "Ошибка регистрации";
 				return;
 			}
 
-			alert("Регистрация успешна! Теперь войди.");
+			alert("Регистрация успешна!");
 			modal.classList.add("hidden");
 			return;
 		}
 
-		// ================= LOGIN =================
 		if (mode === "login") {
 
 			const res = await fetch(`${API}/users`);
@@ -118,6 +130,10 @@ document.getElementById("authSubmit").onclick = async () => {
 			coins = user.coins;
 			updateCoins();
 
+			if (user.isAdmin) {
+				adminBtn.classList.remove("hidden");
+			}
+
 			modal.classList.add("hidden");
 		}
 
@@ -127,45 +143,59 @@ document.getElementById("authSubmit").onclick = async () => {
 	}
 };
 
-// ===============================
-// BET BUTTONS
-// ===============================
+/* ================= BETTING ================= */
+
 document.getElementById("up").onclick = () => placeBet("up");
 document.getElementById("down").onclick = () => placeBet("down");
 
 function placeBet(direction) {
 
+	if (!window.lastCandle) return;
+
+	// ===== 1️⃣ ГОСТЬ =====
 	if (!currentUser) {
-		alert("Сначала войди в аккаунт");
-		return;
+
+		if (guestBetCount >= MAX_GUEST_BETS) {
+			alert("Гость может сыграть только 5 раз");
+			return;
+		}
+
+		guestBetCount++;
 	}
 
-	if (!lastCandle) return;
+	// ===== 2️⃣ ОБЫЧНЫЙ ПОЛЬЗОВАТЕЛЬ =====
+	if (currentUser && !currentUser.isAdmin) {
+
+		if (coins <= 0) {
+			alert("У тебя нет монет");
+			return;
+		}
+	}
+
+	// ===== 3️⃣ АДМИН =====
+	// нет ограничений
 
 	activeBet = {
 		direction,
-		entryPrice: lastCandle.close,
+		entryPrice: window.lastCandle.close,
 	};
 
 	resultLabel.textContent = "Ставка принята, ждём закрытия свечи...";
 	resultLabel.style.color = "white";
 
-	if (direction === "up") janitorSwingUp();
-	else janitorSwingDown();
+	if (direction === "up") window.janitorSwingUp();
+	else window.janitorSwingDown();
 
-	Janitor.startLoop(direction);
+	window.Janitor.startLoop(direction);
 }
 
-// ===============================
-// PRICE UPDATE
-// ===============================
 window.onPriceUpdated = async (candle, closed) => {
 
 	priceLabel.textContent = "Цена: " + candle.close;
 
 	if (closed && activeBet) {
 
-		Janitor.stopLoop();
+		window.Janitor.stopLoop();
 
 		const entry = activeBet.entryPrice;
 		const close = candle.close;
@@ -179,6 +209,15 @@ window.onPriceUpdated = async (candle, closed) => {
 			resultLabel.textContent = "WIN (+1 coin)";
 			resultLabel.style.color = "#22c55e";
 		} else {
+
+			// обычный пользователь не может уйти в минус
+			if (currentUser && !currentUser.isAdmin && coins <= 0) {
+				resultLabel.textContent = "LOSE (ниже 0 нельзя)";
+				resultLabel.style.color = "#ef4444";
+				activeBet = null;
+				return;
+			}
+
 			coins--;
 			resultLabel.textContent = "LOSE (-1 coin)";
 			resultLabel.style.color = "#ef4444";
@@ -186,36 +225,83 @@ window.onPriceUpdated = async (candle, closed) => {
 
 		updateCoins();
 
-		// ================= UPDATE DB =================
-		try {
-			const updatedUser = {
-				id: currentUser.id,
-				username: currentUser.username,
-				passwordHash: currentUser.passwordHash,
-				coins: coins,
-				isAdmin: currentUser.isAdmin
-			};
+		// сохраняем только если пользователь авторизован
+		if (currentUser) {
+			try {
+				const updatedUser = {
+					...currentUser,
+					coins
+				};
 
-			await fetch(`${API}/users/${currentUser.id}`, {
-				method: "PUT",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(updatedUser)
-			});
+				await fetch(`${API}/users/${currentUser.id}`, {
+					method: "PUT",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(updatedUser)
+				});
 
-			currentUser.coins = coins;
-			localStorage.setItem("user", JSON.stringify(currentUser));
+				currentUser.coins = coins;
+				localStorage.setItem("user", JSON.stringify(currentUser));
 
-		} catch (err) {
-			console.error("Ошибка обновления coins", err);
+			} catch (err) {
+				console.error("Ошибка обновления coins", err);
+			}
 		}
 
 		activeBet = null;
 	}
 };
 
-// ===============================
-// SYMBOL CHANGE
-// ===============================
+/* ================= SYMBOL CHANGE ================= */
+
 document.getElementById("symbol-select").onchange = e => {
-	changeSymbol(e.target.value);
+	window.changeSymbol(e.target.value);
+};
+
+/* ================= ADMIN PANEL ================= */
+
+adminBtn.onclick = async () => {
+
+	const res = await fetch(`${API}/users`);
+	const users = await res.json();
+
+	adminUsersList.innerHTML = "";
+
+	users.forEach(user => {
+
+		const div = document.createElement("div");
+		div.style.marginBottom = "10px";
+
+		div.innerHTML = `
+			<b>${user.username}</b> | Coins: 
+			<input type="number" value="${user.coins}" id="coins-${user.id}" style="width:70px">
+			<button onclick="updateUserCoins(${user.id})">Сохранить</button>
+		`;
+
+		adminUsersList.appendChild(div);
+	});
+
+	adminModal.classList.remove("hidden");
+};
+
+document.getElementById("adminClose").onclick = () => {
+	adminModal.classList.add("hidden");
+};
+
+window.updateUserCoins = async function(userId) {
+
+	const input = document.getElementById(`coins-${userId}`);
+	const newCoins = parseInt(input.value);
+
+	const res = await fetch(`${API}/users/${userId}`);
+	const user = await res.json();
+
+	user.coins = newCoins;
+
+	await fetch(`${API}/users/${userId}`, {
+		method: "PUT",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(user)
+	});
+
+	alert("Монеты обновлены");
 };

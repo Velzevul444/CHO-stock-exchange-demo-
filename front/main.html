@@ -4,7 +4,6 @@
 	<meta charset="UTF-8">
 	<title>pureshka</title>
 	<link rel="icon" type="image/png" href="/front/images/pureshka.png">
-
 	<link href="/front/css.css" rel="stylesheet" type="text/css">
 </head>
 
@@ -12,6 +11,7 @@
 
 <div id="registration">Регистрация</div>
 <div id="login">Вход</div>
+<div id="adminPanelBtn" class="hidden">Админ панель</div>
 
 <h1 class="headear">OOO "Честные ставки"</h1>
 
@@ -29,7 +29,6 @@
 </div>
 
 <div id="bet-panel">
-
 	<div id="price">Цена: -</div>
 
 	<button id="up" class="bet up">▲ ВВЕРХ</button>
@@ -45,15 +44,15 @@
 <!-- lightweight charts -->
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
 
-<!-- твои файлы -->
 <script type="module" src="/front/js/chart.js"></script>
 <script type="module" src="/front/js/main.js"></script>
 <script type="module" src="/front/js/janitor.js"></script>
 
-<!-- Canvas для анимации Janitor -->
 <div id="janitor-container">
 	<canvas id="janitorCanvas" width="200" height="200"></canvas>
 </div>
+
+<!-- AUTH MODAL -->
 <div id="authModal" class="modal hidden">
 	<div class="modal-content">
 		<h2 id="authTitle">Вход</h2>
@@ -61,11 +60,37 @@
 		<input type="text" id="authUsername" placeholder="Username">
 		<input type="password" id="authPassword" placeholder="Password">
 
+		<label style="display:flex; align-items:center; gap:8px;">
+			<input type="checkbox" id="authIsAdmin">
+			Я администратор
+		</label>
+
 		<button id="authSubmit">Подтвердить</button>
 		<button id="authClose">Закрыть</button>
 
 		<div id="authError"></div>
 	</div>
 </div>
+
+<!-- ADMIN MODAL -->
+<div id="adminModal" class="modal hidden">
+	<div class="modal-content" style="width:500px;">
+		<h2>Админ панель</h2>
+		<div id="adminUsersList"></div>
+		<button id="adminClose">Закрыть</button>
+	</div>
+</div>
+
+<!-- CHAT MODAL -->
+<div id="chatModal" class="modal hidden">
+	<div class="modal-content" style="width:500px;">
+		<h2>Чат с администрацией</h2>
+		<div id="chatMessages" style="height:200px; overflow:auto; background:#1e293b; padding:10px;"></div>
+		<input type="text" id="chatInput" placeholder="Сообщение">
+		<button id="chatSend">Отправить</button>
+		<button id="chatClose">Закрыть</button>
+	</div>
+</div>
+
 </body>
 </html>

@@ -1,5 +1,3 @@
-// main.js
-
 let activeBet = null;
 let coins = 0;
 
@@ -11,29 +9,33 @@ function updateCoins() {
 	coinsLabel.textContent = coins;
 }
 
-document.getElementById("up").onclick = () => {
-	janitorSwingUp();
-	placeBet("up");
-};
-
-document.getElementById("down").onclick = () => {
-	janitorSwingDown();
-	placeBet("down");
-};
+document.getElementById("up").onclick = () => placeBet("up");
+document.getElementById("down").onclick = () => placeBet("down");
 
 function placeBet(direction) {
 	if (!lastCandle) return;
+
 	activeBet = {
 		direction,
 		entryPrice: lastCandle.close,
 	};
+
 	resultLabel.textContent = "Ставка принята, ждём закрытия свечи...";
+	resultLabel.style.color = "white";
+
+	if (direction === "up") janitorSwingUp();
+	else janitorSwingDown();
+
+	Janitor.startLoop(direction);
 }
 
 window.onPriceUpdated = (candle, closed) => {
 	priceLabel.textContent = "Цена: " + candle.close;
 
 	if (closed && activeBet) {
+
+		Janitor.stopLoop();
+
 		const entry = activeBet.entryPrice;
 		const close = candle.close;
 
@@ -59,6 +61,3 @@ window.onPriceUpdated = (candle, closed) => {
 document.getElementById("symbol-select").onchange = e => {
 	changeSymbol(e.target.value);
 };
-Janitor.instance.add(() => {
-	console.log("Очистка ресурсов при выходе");
-});

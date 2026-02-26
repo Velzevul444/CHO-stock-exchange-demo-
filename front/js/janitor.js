@@ -1,5 +1,5 @@
 // =============================
-//  Pixel Janitor — broom animation (enhanced down movement)
+//  Pixel Janitor — improved 3-state broom system
 // =============================
 
 class PixelJanitor {
@@ -7,25 +7,35 @@ class PixelJanitor {
 		this.canvas = document.getElementById("janitorCanvas");
 		this.ctx = this.canvas.getContext("2d");
 
-		this.broomAngle = 0;
+		this.state = "idle";  // idle / up / down
 		this.isAnimating = false;
+		this.loopTimer = null;
 
-		this.draw(0);
+		this.draw("idle");
 	}
 
-	draw(angle) {
+	// =======================================================
+	// Основной рисунок уборщика + три варианта расположения метлы
+	// =======================================================
+	draw(state) {
 		const ctx = this.ctx;
-
 		ctx.clearRect(0, 0, 200, 200);
 
+		// масштаб (оригинал 400х400)
 		ctx.save();
 		ctx.scale(0.5, 0.5);
+
+		// ---------- пол ----------
+		ctx.fillStyle = "#78909c";
+		ctx.fillRect(0, 280, 400, 120);
+
+		ctx.fillStyle = "#62727b";
+		for (let i = 0; i < 10; i++) ctx.fillRect(i * 40 + 2, 280, 10, 120);
 
 		const C = {
 			SKIN: "#f1c27d",
 			OVERALL: "#3a6ea5",
 			OVERALL_DARK: "#2d5580",
-			SHIRT: "#d4a76a",
 			HAIR: "#2c1e0f",
 			EYE: "#ffffff",
 			PUPIL: "#000000",
@@ -35,26 +45,21 @@ class PixelJanitor {
 			BROOM_DARK: "#a5713c"
 		};
 
-		// Пол
-		ctx.fillStyle = "#78909c";
-		ctx.fillRect(0, 280, 400, 120);
-		ctx.fillStyle = "#62727b";
-		for (let i = 0; i < 10; i++) ctx.fillRect(i * 40 + 2, 280, 10, 120);
-
-		// Ноги
+		// ---------- тело ----------
 		ctx.fillStyle = C.OVERALL_DARK;
 		ctx.fillRect(160, 230, 25, 50);
 		ctx.fillRect(215, 230, 25, 50);
 
-		// Туловище
 		ctx.fillStyle = C.OVERALL;
 		ctx.fillRect(150, 180, 100, 55);
+
 		ctx.fillStyle = C.OVERALL_DARK;
 		ctx.fillRect(150, 200, 100, 10);
 
-		// Голова
+		// ---------- голова ----------
 		ctx.fillStyle = C.SKIN;
 		ctx.fillRect(175, 130, 50, 50);
+
 		ctx.fillStyle = C.HAIR;
 		ctx.fillRect(175, 125, 50, 10);
 		ctx.fillRect(170, 130, 15, 15);
@@ -75,19 +80,27 @@ class PixelJanitor {
 		ctx.fillRect(170, 158, 10, 5);
 		ctx.fillRect(250, 158, 10, 5);
 
-		// Руки
+		// ---------- руки ----------
 		ctx.fillStyle = C.SKIN;
-		if (angle > 0.5) ctx.fillRect(120, 190, 25, 15);
-		else if (angle < 0) ctx.fillRect(120, 215, 25, 15); // ниже, если вниз
-		else ctx.fillRect(120, 200, 25, 15);
 
-		if (angle > 0.5) ctx.fillRect(255, 160, 25, 15);
-		else if (angle < 0) ctx.fillRect(255, 200, 25, 15); // ниже
-		else ctx.fillRect(255, 180, 25, 15);
+		if (state === "up") {
+			ctx.fillRect(120, 190, 25, 15);
+			ctx.fillRect(255, 160, 25, 15);
+		} else if (state === "down") {
+			ctx.fillRect(120, 210, 25, 15);
+			ctx.fillRect(255, 200, 25, 15);
+		} else {
+			// idle
+			ctx.fillRect(120, 200, 25, 15);
+			ctx.fillRect(255, 180, 25, 15);
+		}
 
-		// Метла
-		if (angle > 0.5) {
-			// Вверх
+		// =======================================================
+		//                    МЕТЛА
+		// =======================================================
+
+		// ----- UP -----
+		if (state === "up") {
 			ctx.fillStyle = C.BROOM_HANDLE;
 			ctx.fillRect(280, 110, 100, 12);
 			ctx.fillRect(265, 120, 20, 8);
@@ -98,20 +111,22 @@ class PixelJanitor {
 
 			ctx.fillStyle = C.BROOM_DARK;
 			ctx.fillRect(360, 110, 30, 10);
+		}
 
-		} else if (angle < 0) {
-			// Глубже вниз (ниже обычной позиции)
+		// ----- DOWN (ниже обычного) -----
+		else if (state === "down") {
 			ctx.fillStyle = C.BROOM_HANDLE;
-			ctx.fillRect(270, 220, 100, 12);
+			ctx.fillRect(270, 225, 110, 12); // ниже пола
 
 			ctx.fillStyle = C.BROOM_BRISTLES;
-			ctx.fillRect(360, 210, 25, 50);
+			ctx.fillRect(365, 230, 40, 50);
 
 			ctx.fillStyle = C.BROOM_DARK;
-			ctx.fillRect(360, 245, 25, 10);
+			ctx.fillRect(360, 255, 40, 10);
+		}
 
-		} else {
-			// Обычная вниз
+		// ----- IDLE (оригинальная позиция) -----
+		else {
 			ctx.fillStyle = C.BROOM_HANDLE;
 			ctx.fillRect(270, 190, 100, 10);
 
@@ -125,28 +140,42 @@ class PixelJanitor {
 		ctx.restore();
 	}
 
-	// Анимация
+	// =======================================================
+	//   Анимации (вверх / вниз → idle)
+	// =======================================================
 	animate(direction) {
 		if (this.isAnimating) return;
-
 		this.isAnimating = true;
 
-		if (direction === "up") {
-			this.broomAngle = 1;
-		} else {
-			this.broomAngle = -0.6; // ниже обычного ↓
-		}
-
-		this.draw(this.broomAngle);
+		this.state = direction;
+		this.draw(direction);
 
 		setTimeout(() => {
-			this.broomAngle = 0;
-			this.draw(0);
+			this.state = "idle";
+			this.draw("idle");
 			this.isAnimating = false;
-		}, 320);
+		}, 260);
+	}
+
+	// =======================================================
+	//        Повторные взмахи пока ставка активна
+	// =======================================================
+	startLoop(direction) {
+		this.stopLoop();
+		this.loopTimer = setInterval(() => this.animate(direction), 450);
+	}
+
+	stopLoop() {
+		if (this.loopTimer) {
+			clearInterval(this.loopTimer);
+			this.loopTimer = null;
+		}
 	}
 }
 
+// глобальный объект
 window.Janitor = new PixelJanitor();
-window.janitorSwingUp = () => window.Janitor.animate("up");
+
+// удобные alias-функции
+window.janitorSwingUp   = () => window.Janitor.animate("up");
 window.janitorSwingDown = () => window.Janitor.animate("down");

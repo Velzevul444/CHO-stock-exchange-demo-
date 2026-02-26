@@ -8,7 +8,7 @@ namespace BettingServer.Models
         public int Coins { get; set; }
         public bool IsAdmin { get; set; }
 
-        public ICollection<Bet> Bets { get; set; }
-        public ICollection<AdminMessage> AdminMessages { get; set; }
+        public ICollection<Bet> Bets { get; set; } = new List<Bet>();
+        public ICollection<AdminMessage> AdminMessages { get; set; } = new List<AdminMessage>();
     }
 }

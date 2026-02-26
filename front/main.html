@@ -54,6 +54,18 @@
 <div id="janitor-container">
 	<canvas id="janitorCanvas" width="200" height="200"></canvas>
 </div>
+<div id="authModal" class="modal hidden">
+	<div class="modal-content">
+		<h2 id="authTitle">Вход</h2>
 
+		<input type="text" id="authUsername" placeholder="Username">
+		<input type="password" id="authPassword" placeholder="Password">
+
+		<button id="authSubmit">Подтвердить</button>
+		<button id="authClose">Закрыть</button>
+
+		<div id="authError"></div>
+	</div>
+</div>
 </body>
 </html>

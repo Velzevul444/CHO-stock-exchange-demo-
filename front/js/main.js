@@ -312,6 +312,7 @@ async function loadChat() {
 
 	try {
 		let messages = [];
+
 		if (currentUser.isAdmin) {
 			const res = await fetch(`${API}/messages`);
 			messages = await res.json();
@@ -321,12 +322,23 @@ async function loadChat() {
 		}
 
 		chatMessages.innerHTML = "";
-		messages.sort((a,b)=> new Date(a.createdAt)-new Date(b.createdAt));
+
+		messages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
 		messages.forEach(msg => {
 			const div = document.createElement("div");
-			div.className = "chat-message " + (msg.userId === currentUser.id ? "chat-user" : "chat-admin");
-			div.textContent = msg.messageText;
+
+			div.className =
+				"chat-message " +
+				(msg.userId === currentUser.id ? "chat-user" : "chat-admin");
+
+			if (currentUser.isAdmin) {
+				div.textContent =
+					`${msg.user?.username || "Unknown"}: ${msg.messageText}`;
+			} else {
+				div.textContent = msg.messageText;
+			}
+
 			chatMessages.appendChild(div);
 		});
 

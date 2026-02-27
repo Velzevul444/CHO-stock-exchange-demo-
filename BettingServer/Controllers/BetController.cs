@@ -15,17 +15,30 @@ namespace BettingServer.Controllers
             _service = service;
         }
 
+        // Получить все ставки пользователя
         [HttpGet("user/{userId}")]
-        public IActionResult GetByUser(int userId) =>
-            Ok(_service.GetByUser(userId));
-
-        [HttpPost]
-        public IActionResult Create(Bet bet)
+        public IActionResult GetByUser(int userId)
         {
-            var res = _service.PlaceBet(bet);
-            return res.Success ? Ok(bet) : BadRequest(res.Message);
+            var bets = _service.GetByUser(userId);
+            return Ok(bets);
         }
 
+        // Поставить ставку
+        [HttpPost]
+        public IActionResult PlaceBet([FromBody] Bet bet)
+        {
+            if (bet == null)
+                return BadRequest("Invalid bet");
+
+            var result = _service.PlaceBet(bet);
+
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            return Ok(result.Message);
+        }
+
+        // Удалить ставку
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {

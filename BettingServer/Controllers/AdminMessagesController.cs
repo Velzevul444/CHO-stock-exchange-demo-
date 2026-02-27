@@ -16,15 +16,23 @@ namespace BettingServer.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll() => Ok(_service.GetAll());
+        public IActionResult GetAll()
+        {
+            return Ok(_service.GetAll());
+        }
 
         [HttpGet("user/{userId}")]
-        public IActionResult GetByUser(int userId) =>
-            Ok(_service.GetByUserId(userId));
+        public IActionResult GetByUser(int userId)
+        {
+            return Ok(_service.GetByUserId(userId));
+        }
 
         [HttpPost]
-        public IActionResult Create(AdminMessage message)
+        public IActionResult Create([FromBody] AdminMessage message)
         {
+            if (message == null)
+                return BadRequest();
+
             _service.Add(message);
             return Ok(message);
         }

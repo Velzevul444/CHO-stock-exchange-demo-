@@ -4,8 +4,8 @@ let activeBet = null;
 let coins = 0;
 let currentUser = JSON.parse(localStorage.getItem("user"));
 
-let guestBetCount = 0;          // счётчик для гостя
-const MAX_GUEST_BETS = 5;       // лимит для гостя
+let guestBetCount = 0;
+const MAX_GUEST_BETS = 5;
 
 const priceLabel = document.getElementById("price");
 const resultLabel = document.getElementById("result");
@@ -22,9 +22,15 @@ const adminBtn = document.getElementById("adminPanelBtn");
 const adminModal = document.getElementById("adminModal");
 const adminUsersList = document.getElementById("adminUsersList");
 
-let mode = "login";
+const chatBtn = document.getElementById("chatOpen");
+const chatModal = document.getElementById("chatModal");
+const chatMessages = document.getElementById("chatMessages");
+const chatInput = document.getElementById("chatInput");
+const chatSend = document.getElementById("chatSend");
 
-/* ================= INIT ================= */
+const logoutBtn = document.getElementById("logout");
+
+let mode = "login";
 
 function updateCoins() {
 	coinsLabel.textContent = coins;
@@ -33,16 +39,13 @@ function updateCoins() {
 if (currentUser) {
 	coins = currentUser.coins;
 	updateCoins();
-
-	if (currentUser.isAdmin) {
-		adminBtn.classList.remove("hidden");
-	}
+	if (currentUser.isAdmin) adminBtn.classList.remove("hidden");
+	logoutBtn.classList.remove("hidden");
 } else {
 	coins = 0;
 	updateCoins();
+	logoutBtn.classList.add("hidden");
 }
-
-/* ================= AUTH ================= */
 
 document.getElementById("login").onclick = () => {
 	mode = "login";
@@ -65,7 +68,6 @@ document.getElementById("authClose").onclick = () => {
 };
 
 document.getElementById("authSubmit").onclick = async () => {
-
 	const username = usernameInput.value.trim();
 	const password = passwordInput.value.trim();
 
@@ -75,13 +77,11 @@ document.getElementById("authSubmit").onclick = async () => {
 	}
 
 	try {
-
 		if (mode === "register") {
-
 			if (isAdminCheckbox.checked) {
-				let code = prompt("Введите секретный код администратора:");
-				if (code !== "SUPERADMIN123") {
-					errorDiv.textContent = "Неверный код администратора";
+				let code = prompt("Введите секретный код админа:");
+				if (code !== "1488") {
+					errorDiv.textContent = "Неверный код админа";
 					return;
 				}
 			}
@@ -111,7 +111,6 @@ document.getElementById("authSubmit").onclick = async () => {
 		}
 
 		if (mode === "login") {
-
 			const res = await fetch(`${API}/users`);
 			const users = await res.json();
 
@@ -130,9 +129,9 @@ document.getElementById("authSubmit").onclick = async () => {
 			coins = user.coins;
 			updateCoins();
 
-			if (user.isAdmin) {
-				adminBtn.classList.remove("hidden");
-			}
+			if (user.isAdmin) adminBtn.classList.remove("hidden");
+
+			logoutBtn.classList.remove("hidden");
 
 			modal.classList.add("hidden");
 		}
@@ -143,37 +142,27 @@ document.getElementById("authSubmit").onclick = async () => {
 	}
 };
 
-/* ================= BETTING ================= */
 
 document.getElementById("up").onclick = () => placeBet("up");
 document.getElementById("down").onclick = () => placeBet("down");
 
 function placeBet(direction) {
-
 	if (!window.lastCandle) return;
 
-	// ===== 1️⃣ ГОСТЬ =====
 	if (!currentUser) {
-
 		if (guestBetCount >= MAX_GUEST_BETS) {
 			alert("Гость может сыграть только 5 раз");
 			return;
 		}
-
 		guestBetCount++;
 	}
 
-	// ===== 2️⃣ ОБЫЧНЫЙ ПОЛЬЗОВАТЕЛЬ =====
 	if (currentUser && !currentUser.isAdmin) {
-
 		if (coins <= 0) {
 			alert("У тебя нет монет");
 			return;
 		}
 	}
-
-	// ===== 3️⃣ АДМИН =====
-	// нет ограничений
 
 	activeBet = {
 		direction,
@@ -190,11 +179,9 @@ function placeBet(direction) {
 }
 
 window.onPriceUpdated = async (candle, closed) => {
-
 	priceLabel.textContent = "Цена: " + candle.close;
 
 	if (closed && activeBet) {
-
 		window.Janitor.stopLoop();
 
 		const entry = activeBet.entryPrice;
@@ -209,15 +196,12 @@ window.onPriceUpdated = async (candle, closed) => {
 			resultLabel.textContent = "WIN (+1 coin)";
 			resultLabel.style.color = "#22c55e";
 		} else {
-
-			// обычный пользователь не может уйти в минус
 			if (currentUser && !currentUser.isAdmin && coins <= 0) {
 				resultLabel.textContent = "LOSE (ниже 0 нельзя)";
 				resultLabel.style.color = "#ef4444";
 				activeBet = null;
 				return;
 			}
-
 			coins--;
 			resultLabel.textContent = "LOSE (-1 coin)";
 			resultLabel.style.color = "#ef4444";
@@ -225,23 +209,16 @@ window.onPriceUpdated = async (candle, closed) => {
 
 		updateCoins();
 
-		// сохраняем только если пользователь авторизован
 		if (currentUser) {
 			try {
-				const updatedUser = {
-					...currentUser,
-					coins
-				};
-
+				const updatedUser = { ...currentUser, coins };
 				await fetch(`${API}/users/${currentUser.id}`, {
 					method: "PUT",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify(updatedUser)
 				});
-
 				currentUser.coins = coins;
 				localStorage.setItem("user", JSON.stringify(currentUser));
-
 			} catch (err) {
 				console.error("Ошибка обновления coins", err);
 			}
@@ -251,32 +228,23 @@ window.onPriceUpdated = async (candle, closed) => {
 	}
 };
 
-/* ================= SYMBOL CHANGE ================= */
-
 document.getElementById("symbol-select").onchange = e => {
 	window.changeSymbol(e.target.value);
 };
 
-/* ================= ADMIN PANEL ================= */
-
 adminBtn.onclick = async () => {
-
 	const res = await fetch(`${API}/users`);
 	const users = await res.json();
 
 	adminUsersList.innerHTML = "";
 
 	users.forEach(user => {
-
 		const div = document.createElement("div");
-		div.style.marginBottom = "10px";
-
 		div.innerHTML = `
 			<b>${user.username}</b> | Coins: 
 			<input type="number" value="${user.coins}" id="coins-${user.id}" style="width:70px">
 			<button onclick="updateUserCoins(${user.id})">Сохранить</button>
 		`;
-
 		adminUsersList.appendChild(div);
 	});
 
@@ -288,7 +256,6 @@ document.getElementById("adminClose").onclick = () => {
 };
 
 window.updateUserCoins = async function(userId) {
-
 	const input = document.getElementById(`coins-${userId}`);
 	const newCoins = parseInt(input.value);
 
@@ -305,3 +272,70 @@ window.updateUserCoins = async function(userId) {
 
 	alert("Монеты обновлены");
 };
+
+chatBtn.onclick = async () => {
+	chatModal.classList.remove("hidden");
+	await loadChat();
+};
+
+document.getElementById("chatClose").onclick = () => chatModal.classList.add("hidden");
+
+logoutBtn.onclick = () => {
+	localStorage.removeItem("user");
+	location.reload();
+};
+
+chatSend.onclick = async () => {
+	const text = chatInput.value.trim();
+	if (!text || !currentUser) return;
+
+	const message = {
+		userId: currentUser.id,
+		messageText: text
+	};
+
+	try {
+		await fetch(`${API}/messages`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(message)
+		});
+		chatInput.value = "";
+		await loadChat();
+	} catch (err) {
+		console.error("Ошибка отправки сообщения", err);
+	}
+};
+
+async function loadChat() {
+	if (!currentUser) return;
+
+	try {
+		let messages = [];
+		if (currentUser.isAdmin) {
+			const res = await fetch(`${API}/messages`);
+			messages = await res.json();
+		} else {
+			const res = await fetch(`${API}/messages/user/${currentUser.id}`);
+			messages = await res.json();
+		}
+
+		chatMessages.innerHTML = "";
+		messages.sort((a,b)=> new Date(a.createdAt)-new Date(b.createdAt));
+
+		messages.forEach(msg => {
+			const div = document.createElement("div");
+			div.className = "chat-message " + (msg.userId === currentUser.id ? "chat-user" : "chat-admin");
+			div.textContent = msg.messageText;
+			chatMessages.appendChild(div);
+		});
+
+		chatMessages.scrollTop = chatMessages.scrollHeight;
+	} catch (err) {
+		console.error("Ошибка загрузки чата", err);
+	}
+}
+
+if (currentUser && currentUser.isAdmin) {
+	setInterval(loadChat, 3000);
+}

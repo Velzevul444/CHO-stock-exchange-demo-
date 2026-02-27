@@ -10,17 +10,19 @@ h1 {
 	padding: 20px;
 }
 
-/* ================== AUTH BUTTONS ================== */
-
-#registration,
-#login,
-#adminPanelBtn {
+.header-buttons {
 	position: absolute;
 	top: 15px;
+	right: 20px;
+	display: flex;
+	gap: 12px;
+	z-index: 10000;
+}
+
+.header-buttons button {
 	padding: 10px 18px;
 	font-size: 16px;
 	font-weight: bold;
-	background: #1e293b;
 	color: #e2e8f0;
 	border: 1px solid #334155;
 	border-radius: 10px;
@@ -29,25 +31,20 @@ h1 {
 	box-shadow: 0 0 10px rgba(0,0,0,0.35);
 }
 
-#registration { right: 20px; }
-#login { right: 150px; }
-#adminPanelBtn { right: 280px; background:#7c3aed; }
-
-#registration:hover,
-#login:hover,
-#adminPanelBtn:hover {
-	background: #334155;
-	border-color: #475569;
+.header-buttons button:hover {
 	transform: translateY(-2px);
+	opacity: 0.9;
 }
 
-#registration:active,
-#login:active,
-#adminPanelBtn:active {
+.header-buttons button:active {
 	transform: translateY(0);
 }
 
-/* ================== CHART ================== */
+#registration { background: #e108ef; }
+#login { background: #155dd7; }
+#logout { background: #dc2626; }
+#adminPanelBtn { background: #7c3aed; }
+#chatOpen { background: #16a34a; }
 
 #chart {
 	position: relative;
@@ -55,8 +52,6 @@ h1 {
 	height: 600px;
 	margin: auto;
 }
-
-/* ================== BET PANEL ================== */
 
 #bet-panel {
 	margin-top: 20px;
@@ -73,10 +68,7 @@ h1 {
 	transition: 0.2s;
 }
 
-.bet:hover {
-	transform: scale(1.05);
-}
-
+.bet:hover { transform: scale(1.05); }
 .up { background: #16a34a; }
 .down { background: #dc2626; }
 
@@ -95,8 +87,6 @@ h1 {
 	padding: 12px 20px;
 	border-radius: 12px;
 }
-
-/* ================== SYMBOL SELECT ================== */
 
 #symbol-wrapper {
 	position: absolute;
@@ -131,11 +121,7 @@ h1 {
 	transition: 0.2s;
 }
 
-#symbol-select:hover {
-	border-color: #64748b;
-}
-
-/* ================== JANITOR ================== */
+#symbol-select:hover { border-color: #64748b; }
 
 #janitor-container {
 	position: fixed;
@@ -152,8 +138,6 @@ h1 {
 	cursor: pointer;
 }
 
-/* ================== MODALS ================== */
-
 .modal {
 	position: fixed;
 	inset: 0;
@@ -164,9 +148,7 @@ h1 {
 	z-index: 999999;
 }
 
-.hidden {
-	display: none;
-}
+.hidden { display: none; }
 
 .modal-content {
 	background: #0f172a;
@@ -180,9 +162,7 @@ h1 {
 	box-shadow: 0 0 25px rgba(0,0,0,0.6);
 }
 
-.modal-content h2 {
-	margin: 0;
-}
+.modal-content h2 { margin: 0; }
 
 .modal-content input {
 	padding: 10px;
@@ -201,24 +181,11 @@ h1 {
 	transition: 0.2s;
 }
 
-.modal-content button:hover {
-	transform: scale(1.05);
-}
+.modal-content button:hover { transform: scale(1.05); }
 
-#authSubmit {
-	background: #16a34a;
-}
-
-#authClose {
-	background: #dc2626;
-}
-
-#authError {
-	color: #ef4444;
-	font-weight: bold;
-}
-
-/* ================== ADMIN PANEL ================== */
+#authSubmit { background: #16a34a; }
+#authClose  { background: #dc2626; }
+#authError  { color: #ef4444; font-weight: bold; }
 
 #adminUsersList {
 	text-align: left;
@@ -257,8 +224,6 @@ h1 {
 	border-radius: 6px;
 }
 
-/* ================== CHAT ================== */
-
 #chatMessages {
 	height: 220px;
 	overflow-y: auto;
@@ -276,31 +241,12 @@ h1 {
 	border-radius: 8px;
 	max-width: 80%;
 	font-size: 14px;
+	word-wrap: break-word;
 }
 
-.chat-user {
-	background: #2563eb;
-	align-self: flex-start;
-}
+.chat-user  { background: #2563eb; align-self: flex-start; color:white; }
+.chat-admin { background: #16a34a; align-self: flex-end; color:white; }
 
-.chat-admin {
-	background: #16a34a;
-	align-self: flex-end;
-}
-
-#chatInput {
-	background: #020617;
-	border: 1px solid #334155;
-	color: white;
-	border-radius: 8px;
-	padding: 8px;
-}
-
-#chatSend {
-	background: #7c3aed;
-}
-
-#chatClose {
-	background: #dc2626;
-}
-
+#chatInput { background: #020617; border: 1px solid #334155; color: white; border-radius: 8px; padding: 8px; }
+#chatSend   { background: #7c3aed; }
+#chatClose  { background: #dc2626; }

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ================= CORS =================
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
@@ -17,7 +17,6 @@ builder.Services.AddCors(options =>
                 .AllowAnyMethod();
         });
 });
-// ========================================
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -38,9 +37,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// ================= ВАЖНО =================
 app.UseCors("AllowFrontend");
-// =========================================
 
 app.UseSwagger();
 app.UseSwaggerUI();

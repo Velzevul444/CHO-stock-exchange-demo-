@@ -1,5 +1,3 @@
-// chart.js
-
 const LW = window.LightweightCharts;
 
 let container = document.getElementById("chart");

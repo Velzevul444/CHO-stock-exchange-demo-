@@ -373,7 +373,7 @@ class StyledJanitor {
 		ctx.textAlign = "center";
 		ctx.textBaseline = "middle";
 		ctx.font = `${Math.max(8, Math.round(9.4 * scale))}px "JetBrains Mono", monospace`;
-		ctx.fillText("МИРЭА", signX + signW / 2, signY + signH / 2 + 0.5 * scale);
+		ctx.fillText("РАНХИГС", signX + signW / 2, signY + signH / 2 + 0.5 * scale);
 
 		const floorGradient = ctx.createLinearGradient(0, floorY - 36 * scale, 0, height);
 		floorGradient.addColorStop(0, "rgba(227, 236, 244, 0.25)");

@@ -253,9 +253,11 @@ body[data-theme="dark"] .theme-switch::after {
 	font-size: 0.92rem;
 	font-weight: 600;
 	color: #f8fafc;
+	text-shadow: 0 1px 2px rgba(2, 6, 23, 0.45);
 	cursor: pointer;
 	transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
 	box-shadow: 0 10px 20px rgba(15, 23, 42, 0.22);
+	background: linear-gradient(130deg, #334155, #1f2937);
 }
 
 .header-buttons button:hover {
@@ -267,28 +269,38 @@ body[data-theme="dark"] .theme-switch::after {
 	transform: translateY(0);
 }
 
+#registration,
+#login,
+#logout,
+#adminPanelBtn,
+#chatOpen,
+#newsOpen {
+	text-shadow: none;
+}
+
 #registration {
-	background: linear-gradient(130deg, var(--blue-1), var(--blue-2));
+	background: linear-gradient(130deg, #dc2626, #ef4444);
 }
 
 #login {
-	background: linear-gradient(130deg, #0284c7, #0ea5e9);
+	background: linear-gradient(130deg, #ea580c, #fb923c);
 }
 
 #logout {
-	background: linear-gradient(130deg, var(--red-1), var(--red-2));
+	background: linear-gradient(130deg, #eab308, #fde047);
+	color: #1f2937;
 }
 
 #adminPanelBtn {
-	background: linear-gradient(130deg, var(--amber-1), var(--amber-2));
+	background: linear-gradient(130deg, #16a34a, #4ade80);
 }
 
 #chatOpen {
-	background: linear-gradient(130deg, var(--green-1), var(--green-2));
+	background: linear-gradient(130deg, #2563eb, #60a5fa);
 }
 
 #newsOpen {
-	background: linear-gradient(130deg, #0891b2, #06b6d4);
+	background: linear-gradient(130deg, #7e22ce, #c084fc);
 }
 
 .dashboard {
@@ -418,6 +430,79 @@ body[data-theme="dark"] .theme-switch::after {
 #price {
 	font-family: var(--font-mono);
 	font-size: 1.06rem;
+	font-weight: 600;
+}
+
+.bet-amount-panel {
+	margin-top: 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.bet-amount-panel label {
+	font-size: 0.82rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--muted);
+}
+
+.bet-amount-row {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+#betAmount {
+	flex: 1;
+	min-width: 0;
+	padding: 9px 11px;
+	border-radius: 10px;
+	border: 1px solid var(--border);
+	background: var(--input-bg);
+	color: var(--text);
+	font-size: 0.94rem;
+	font-weight: 700;
+}
+
+#betAmount:disabled {
+	opacity: 0.7;
+	cursor: not-allowed;
+}
+
+.bet-size-btn {
+	min-width: 54px;
+	border: 1px solid var(--border);
+	border-radius: 10px;
+	padding: 9px 11px;
+	background: var(--surface-soft);
+	color: var(--text);
+	font-size: 0.82rem;
+	font-weight: 700;
+	cursor: pointer;
+	transition: transform 0.15s ease, filter 0.2s ease;
+}
+
+.bet-size-btn:hover {
+	transform: translateY(-1px);
+	filter: brightness(1.05);
+}
+
+.bet-size-btn:active {
+	transform: translateY(0);
+}
+
+.bet-size-btn:disabled {
+	opacity: 0.65;
+	cursor: not-allowed;
+	transform: none;
+	filter: none;
+}
+
+.bet-amount-hint {
+	font-size: 0.82rem;
+	color: var(--muted);
 	font-weight: 600;
 }
 

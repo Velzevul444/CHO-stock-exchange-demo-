@@ -8,10 +8,46 @@ let guestBetCount = 0;
 const MAX_GUEST_BETS = 5;
 
 let usersCache = {};
+const MIN_STAKE = 0.5;
+const STAKE_STEP = 0.5;
 
 const priceLabel = document.getElementById("price");
 const resultLabel = document.getElementById("result");
 const coinsLabel = document.getElementById("coins");
+const betAmountInput = document.getElementById("betAmount");
+const betHalfBtn = document.getElementById("betHalf");
+const betAllBtn = document.getElementById("betAll");
+const betWhistleAudio = new Audio("/front/Sounds/mellstroy-svist.mp3");
+const betWinAudio = new Audio("/front/Sounds/mellstroy-bravo_d07CfHuv.mp3");
+const betLoseAudio = new Audio("/front/Sounds/mellstroy-handi.mp3");
+
+betWhistleAudio.loop = true;
+betWhistleAudio.preload = "auto";
+betWinAudio.preload = "auto";
+betLoseAudio.preload = "auto";
+
+function playAudio(audio, { reset = true } = {}) {
+	try {
+		if (reset) {
+			audio.currentTime = 0;
+		}
+		const playPromise = audio.play();
+		if (playPromise && typeof playPromise.catch === "function") {
+			playPromise.catch(() => {});
+		}
+	} catch {
+		// Ignore autoplay/runtime audio errors.
+	}
+}
+
+function stopAudio(audio) {
+	try {
+		audio.pause();
+		audio.currentTime = 0;
+	} catch {
+		// Ignore runtime audio errors.
+	}
+}
 
 const modal = document.getElementById("authModal");
 const title = document.getElementById("authTitle");
@@ -84,12 +120,88 @@ function openQuickMenu() {
 }
 
 function updateCoins() {
-	coinsLabel.textContent = coins;
+	coinsLabel.textContent = formatCoins(coins);
+	syncBetControls();
+}
+
+function roundCoins(value) {
+	return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+}
+
+function formatCoins(value) {
+	if (!Number.isFinite(value)) {
+		return "0";
+	}
+
+	return Number.isInteger(value)
+		? String(value)
+		: value.toFixed(2).replace(/\.?0+$/, "");
+}
+
+function getMaxStake() {
+	if (!currentUser) {
+		return 0;
+	}
+
+	return roundCoins(Math.max(0, Number(coins) || 0));
+}
+
+function normalizeStake(value) {
+	const rounded = Math.round((Number(value) + Number.EPSILON) / STAKE_STEP) * STAKE_STEP;
+	return roundCoins(rounded);
+}
+
+function setStakeInputValue(value) {
+	if (!betAmountInput) {
+		return;
+	}
+
+	betAmountInput.value = formatCoins(Math.max(MIN_STAKE, normalizeStake(value)));
+}
+
+function readStakeInputValue() {
+	if (!betAmountInput) {
+		return Number.NaN;
+	}
+
+	return Number(String(betAmountInput.value).replace(",", ".").trim());
+}
+
+function syncBetControls() {
+	if (!betAmountInput || !betHalfBtn || !betAllBtn) {
+		return;
+	}
+
+	const maxStake = getMaxStake();
+	const controlsDisabled = maxStake < MIN_STAKE;
+	betAmountInput.disabled = controlsDisabled;
+	betHalfBtn.disabled = controlsDisabled;
+	betAllBtn.disabled = controlsDisabled;
+
+	if (controlsDisabled) {
+		betAmountInput.value = "";
+		betAmountInput.placeholder = currentUser ? "Нет койнов" : "Только для аккаунта";
+		return;
+	}
+
+	betAmountInput.placeholder = `${formatCoins(MIN_STAKE)} - ${formatCoins(maxStake)}`;
+	const currentValue = readStakeInputValue();
+	if (!Number.isFinite(currentValue) || currentValue < MIN_STAKE) {
+		setStakeInputValue(Math.min(1, maxStake));
+		return;
+	}
+
+	if (currentValue > maxStake) {
+		setStakeInputValue(maxStake);
+		return;
+	}
+
+	setStakeInputValue(currentValue);
 }
 
 function initUserState() {
 	if (currentUser) {
-		coins = currentUser.coins;
+		coins = roundCoins(Number(currentUser.coins) || 0);
 		updateCoins();
 		if (currentUser.isAdmin) adminBtn.classList.remove("hidden");
 		logoutBtn.classList.remove("hidden");
@@ -230,8 +342,42 @@ document.getElementById("authSubmit").onclick = async () => {
 document.getElementById("up").onclick = () => placeBet("up");
 document.getElementById("down").onclick = () => placeBet("down");
 
+if (betHalfBtn) {
+	betHalfBtn.onclick = () => {
+		const maxStake = getMaxStake();
+		if (maxStake < MIN_STAKE) {
+			return;
+		}
+
+		setStakeInputValue(Math.max(MIN_STAKE, maxStake / 2));
+	};
+}
+
+if (betAllBtn) {
+	betAllBtn.onclick = () => {
+		const maxStake = getMaxStake();
+		if (maxStake < MIN_STAKE) {
+			return;
+		}
+
+		setStakeInputValue(maxStake);
+	};
+}
+
+if (betAmountInput) {
+	betAmountInput.addEventListener("blur", () => {
+		syncBetControls();
+	});
+}
+
 function placeBet(direction) {
 	if (!window.lastCandle) return;
+	if (activeBet) {
+		alert("Дождись закрытия свечи по текущей ставке");
+		return;
+	}
+
+	let stake = 1;
 
 	if (!currentUser) {
 		if (guestBetCount >= MAX_GUEST_BETS) {
@@ -239,20 +385,39 @@ function placeBet(direction) {
 			return;
 		}
 		guestBetCount++;
-	}
+	} else {
+		const maxStake = getMaxStake();
+		if (maxStake < MIN_STAKE) {
+			alert("У тебя нет койнов");
+			return;
+		}
 
-	if (currentUser && !currentUser.isAdmin && coins <= 0) {
-		alert("У тебя нет монет");
-		return;
+		const requestedStake = readStakeInputValue();
+		if (!Number.isFinite(requestedStake) || requestedStake < MIN_STAKE) {
+			alert("Введи сумму ставки");
+			return;
+		}
+
+		const normalizedStake = normalizeStake(requestedStake);
+		if (normalizedStake > maxStake + 0.0001) {
+			setStakeInputValue(maxStake);
+			alert("Ставка не может быть больше твоего баланса");
+			return;
+		}
+
+		stake = Math.max(MIN_STAKE, normalizedStake);
+		setStakeInputValue(stake);
 	}
 
 	activeBet = {
 		direction,
 		entryPrice: window.lastCandle.close,
+		stake,
 	};
 
-	resultLabel.textContent = "Ставка принята...";
+	resultLabel.textContent = `Ставка ${formatCoins(stake)} принята...`;
 	resultLabel.style.color = "white";
+	playAudio(betWhistleAudio);
 
 	if (direction === "up") window.janitorSwingUp?.();
 	else window.janitorSwingDown?.();
@@ -266,6 +431,7 @@ window.onPriceUpdated = async (candle, closed) => {
 	if (closed && activeBet) {
 
 		window.Janitor?.stopLoop?.();
+		stopAudio(betWhistleAudio);
 
 		const entry = activeBet.entryPrice;
 		const close = candle.close;
@@ -273,29 +439,33 @@ window.onPriceUpdated = async (candle, closed) => {
 		let win =
 			(activeBet.direction === "up" && close > entry) ||
 			(activeBet.direction === "down" && close < entry);
+		const stake = activeBet.stake || 1;
 
 		if (win) {
-			coins++;
-			resultLabel.textContent = "WIN (+1)";
+			coins = roundCoins(coins + stake);
+			resultLabel.textContent = `WIN x2 (+${formatCoins(stake)})`;
 			resultLabel.style.color = "#22c55e";
 			window.Janitor?.playWin?.();
+			playAudio(betWinAudio);
 		} else {
-			coins--;
-			resultLabel.textContent = "LOSE (-1)";
+			coins = roundCoins(Math.max(0, coins - stake));
+			resultLabel.textContent = `LOSE (-${formatCoins(stake)})`;
 			resultLabel.style.color = "#ef4444";
 			window.Janitor?.playLose?.();
+			playAudio(betLoseAudio);
 		}
 
 		updateCoins();
 
 		if (currentUser) {
 			currentUser.coins = coins;
-
-			await fetch(`${API}/users/${currentUser.id}`, {
-				method: "PUT",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(currentUser)
-			});
+			if (Number.isInteger(currentUser.coins)) {
+				await fetch(`${API}/users/${currentUser.id}`, {
+					method: "PUT",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(currentUser)
+				});
+			}
 
 			localStorage.setItem("user", JSON.stringify(currentUser));
 		}
@@ -418,6 +588,7 @@ async function loadChat() {
 
 logoutBtn.onclick = () => {
 	closeQuickMenu();
+	stopAudio(betWhistleAudio);
 	localStorage.removeItem("user");
 	location.reload();
 };

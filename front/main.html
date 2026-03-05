@@ -72,14 +72,23 @@
 		</div>
 	</section>
 
-	<section class="controls-row">
-		<div id="bet-panel">
-			<div id="price">Цена: -</div>
-			<div class="bet-buttons">
-				<button id="up" class="bet up">▲ ВВЕРХ</button>
-				<button id="down" class="bet down">▼ ВНИЗ</button>
-			</div>
-			<div id="result">Ставка не сделана</div>
+		<section class="controls-row">
+			<div id="bet-panel">
+				<div id="price">Цена: -</div>
+				<div class="bet-amount-panel">
+					<label for="betAmount">Сумма ставки</label>
+					<div class="bet-amount-row">
+						<input id="betAmount" type="number" min="0.5" step="0.5" placeholder="Только для аккаунта">
+						<button id="betHalf" class="bet-size-btn" type="button">1/2</button>
+						<button id="betAll" class="bet-size-btn" type="button">ALL</button>
+					</div>
+					<div class="bet-amount-hint">Выплата: x2</div>
+				</div>
+				<div class="bet-buttons">
+					<button id="up" class="bet up">▲ ВВЕРХ</button>
+					<button id="down" class="bet down">▼ ВНИЗ</button>
+				</div>
+				<div id="result">Ставка не сделана</div>
 		</div>
 
 		<div id="scoreboard">

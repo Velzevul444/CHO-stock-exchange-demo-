@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BettingServer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+291880dfca71e53ab06502374372025ef022cdf9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fc7506d76c398fcd08fcc3ddee027221cf853b9f")]
 [assembly: System.Reflection.AssemblyProductAttribute("BettingServer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BettingServer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

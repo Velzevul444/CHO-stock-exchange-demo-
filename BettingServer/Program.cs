@@ -12,9 +12,10 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-                .WithOrigins("http://localhost:63343")
+                .WithOrigins("http://localhost:63344") // точный порт фронтенда
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowCredentials(); // если используешь куки или авторизацию
         });
 });
 

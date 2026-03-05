@@ -15,7 +15,6 @@ namespace BettingServer.Controllers
             _service = service;
         }
 
-        // Получить все ставки пользователя
         [HttpGet("user/{userId}")]
         public IActionResult GetByUser(int userId)
         {
@@ -23,7 +22,6 @@ namespace BettingServer.Controllers
             return Ok(bets);
         }
 
-        // Поставить ставку
         [HttpPost]
         public IActionResult PlaceBet([FromBody] Bet bet)
         {
@@ -38,7 +36,6 @@ namespace BettingServer.Controllers
             return Ok(result.Message);
         }
 
-        // Удалить ставку
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {

@@ -1,59 +1,103 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>pureshka</title>
 	<link rel="icon" type="image/png" href="/front/images/pureshka.png">
 	<link rel="stylesheet" href="css.css">
 </head>
-<body>
+<body data-theme="light">
 
-<div class="header-buttons">
-	<button id="registration">Регистрация</button>
-	<button id="login">Вход</button>
-	<button id="logout" class="hidden">Выход</button>
-	<button id="adminPanelBtn" class="hidden">Админ панель</button>
-	<button id="chatOpen">Чат</button>
-</div>
-
-<h1 class="headear">OOO "Честные ставки"</h1>
-
-<div id="chart">
-	<div id="symbol-wrapper">
-		<span id="symbol-label">Монета:</span>
-		<select id="symbol-select">
-			<option value="BTCUSDT">BTC</option>
-			<option value="ETHUSDT">ETH</option>
-			<option value="BNBUSDT">BNB</option>
-			<option value="SOLUSDT">SOL</option>
-			<option value="XRPUSDT">XRP</option>
-		</select>
+<header class="topbar">
+	<h1 class="site-title">OOO "Честные ставки"</h1>
+	<div class="topbar-actions">
+		<button id="themeToggle" class="icon-button theme-switch" type="button" aria-label="Включить ночной режим"></button>
+		<button id="menuToggle" class="icon-button menu-toggle" type="button" aria-label="Открыть меню">
+			<span></span>
+			<span></span>
+			<span></span>
+		</button>
 	</div>
-</div>
+</header>
 
-<div id="bet-panel">
-	<div id="price">Цена: -</div>
-	<button id="up" class="bet up">▲ ВВЕРХ</button>
-	<button id="down" class="bet down">▼ ВНИЗ</button>
-	<div id="result">Ставка не сделана</div>
-</div>
+<div id="quickMenu" class="quick-menu hidden">
+		<div class="quick-menu-panel">
+			<div class="header-buttons">
+				<button id="registration">Регистрация</button>
+				<button id="login">Вход</button>
+				<button id="logout" class="hidden">Выход</button>
+				<button id="adminPanelBtn" class="hidden">Админ панель</button>
+				<button id="chatOpen">Чат</button>
+				<button id="newsOpen">Новости</button>
+			</div>
+		</div>
+	</div>
 
-<div id="scoreboard">
-	Койны: <span id="coins">0</span>
-</div>
+<main class="dashboard">
+	<section class="chart-card">
+		<div id="chart">
+			<div id="symbol-wrapper">
+				<div class="chart-control-group">
+					<span id="symbol-label" class="chart-control-label">Монета</span>
+					<select id="symbol-select">
+						<option value="BTCUSDT">BTC</option>
+						<option value="ETHUSDT">ETH</option>
+						<option value="BNBUSDT">BNB</option>
+						<option value="SOLUSDT">SOL</option>
+						<option value="XRPUSDT">XRP</option>
+					</select>
+				</div>
+				<div class="chart-control-group">
+					<span class="chart-control-label">Таймфрейм</span>
+					<select id="timeframe-select">
+						<option value="1m">1m</option>
+						<option value="5m">5m</option>
+						<option value="15m">15m</option>
+						<option value="1h">1h</option>
+						<option value="4h">4h</option>
+					</select>
+				</div>
+				<div class="chart-control-group">
+					<span class="chart-control-label">Свечей</span>
+					<select id="candle-limit-select">
+						<option value="100">100</option>
+						<option value="200" selected>200</option>
+						<option value="300">300</option>
+						<option value="500">500</option>
+					</select>
+				</div>
+				<button id="applyChartSettings" type="button">Применить</button>
+			</div>
+		</div>
+	</section>
 
-<!-- JANITOR -->
-<div id="janitor-container">
-	<canvas id="janitorCanvas" width="200" height="200"></canvas>
-</div>
+	<section class="controls-row">
+		<div id="bet-panel">
+			<div id="price">Цена: -</div>
+			<div class="bet-buttons">
+				<button id="up" class="bet up">▲ ВВЕРХ</button>
+				<button id="down" class="bet down">▼ ВНИЗ</button>
+			</div>
+			<div id="result">Ставка не сделана</div>
+		</div>
 
-<!-- AUTH MODAL -->
+		<div id="scoreboard">
+			Койны: <span id="coins">0</span>
+		</div>
+
+		<div id="janitor-container">
+			<canvas id="janitorCanvas" width="260" height="320"></canvas>
+		</div>
+	</section>
+</main>
+
 <div id="authModal" class="modal hidden">
 	<div class="modal-content">
 		<h2 id="authTitle">Вход</h2>
 		<input type="text" id="authUsername" placeholder="Username">
 		<input type="password" id="authPassword" placeholder="Password">
-		<label style="display:flex; align-items:center; gap:8px;">
+		<label class="auth-admin-label">
 			<input type="checkbox" id="authIsAdmin">
 			Я администратор
 		</label>
@@ -64,7 +108,7 @@
 </div>
 
 <div id="adminModal" class="modal hidden">
-	<div class="modal-content" style="width:500px;">
+	<div class="modal-content modal-content-wide">
 		<h2>Админ панель</h2>
 		<div id="adminUsersList"></div>
 		<button id="adminClose">Закрыть</button>
@@ -72,18 +116,30 @@
 </div>
 
 <div id="chatModal" class="modal hidden">
-	<div class="modal-content" style="width:500px;">
+	<div class="modal-content modal-content-wide">
 		<h2>Чат с администрацией</h2>
-		<div id="chatMessages" style="height:200px; overflow:auto; background:#1e293b; padding:10px;"></div>
+		<div id="chatMessages"></div>
 		<input type="text" id="chatInput" placeholder="Сообщение">
 		<button id="chatSend">Отправить</button>
 		<button id="chatClose">Закрыть</button>
 	</div>
 </div>
 
+<div id="newsModal" class="modal hidden">
+	<div class="modal-content modal-content-wide news-modal-content">
+		<div class="news-modal-header">
+			<h2>Крипто новости</h2>
+			<button id="newsRefresh">Обновить</button>
+		</div>
+		<div id="newsList" class="news-list"></div>
+		<button id="newsClose">Закрыть</button>
+	</div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
 <script type="module" src="/front/js/chart.js"></script>
 <script type="module" src="/front/js/main.js"></script>
+<script type="module" src="/front/js/news.js"></script>
 <script type="module" src="/front/js/janitor.js"></script>
 
 </body>
